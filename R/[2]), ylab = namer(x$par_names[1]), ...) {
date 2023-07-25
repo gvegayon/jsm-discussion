@@ -1,0 +1,53 @@
+bquote                  package:base                   R Documentation
+
+_P_a_r_t_i_a_l _s_u_b_s_t_i_t_u_t_i_o_n _i_n _e_x_p_r_e_s_s_i_o_n_s
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     An analogue of the LISP backquote macro.  ‘bquote’ quotes its
+     argument except that terms wrapped in ‘.()’ are evaluated in the
+     specified ‘where’ environment. If ‘splice = TRUE’ then terms
+     wrapped in ‘..()’ are evaluated and spliced into a call.
+
+_U_s_a_g_e:
+
+     bquote(expr, where = parent.frame(), splice = FALSE)
+     
+_A_r_g_u_m_e_n_t_s:
+
+    expr: A language object.
+
+   where: An environment.
+
+  splice: Logical; if ‘TRUE’ splicing is enabled.
+
+_V_a_l_u_e:
+
+     A language object.
+
+_S_e_e _A_l_s_o:
+
+     ‘quote’, ‘substitute’
+
+_E_x_a_m_p_l_e_s:
+
+     require(graphics)
+     
+     a <- 2
+     
+     bquote(a == a)
+     quote(a == a)
+     
+     bquote(a == .(a))
+     substitute(a == A, list(A = a))
+     
+     plot(1:10, a*(1:10), main = bquote(a == .(a)))
+     
+     ## to set a function default arg
+     default <- 1
+     bquote( function(x, y = .(default)) x+y )
+     
+     exprs <- expression(x <- 1, y <- 2, x + y)
+     bquote(function() {..(exprs)}, splice = TRUE)
+     
+

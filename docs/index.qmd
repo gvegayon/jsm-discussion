@@ -1,0 +1,185 @@
+---
+title: 'Power and multicollinearity in small networks: A discussion of'
+subtitle: '<text style="font-size: 170%;">"Tale of Two Datasets: Representativeness and Generalisability of Inference for Samples of Networks"</text><br><br>JSM 2023<br>Toronto, Canada'
+author: 
+  - George G. Vega Yon, Ph.D.
+institute: The University of Utah
+aspectratio: 169
+date: 2023-06-28
+format:
+  revealjs:
+    slide-number: true
+    footer: Vega Yon et al -- ggv.cl/slides/jsm2023 -- The University of Utah
+    theme: ["default", "style.scss"]
+    title-slide-attributes: 
+      data-background-image: 'Zoom-Background_PrideU.jpg'
+      data-background-opacity: '0.2'
+      data-background-size: 'contain'
+    fig-align: center
+    embed-resources: true
+    mermaid-format: png
+    self-contained-math: true
+bibliography: ../Bibliography-MM-MC.bib
+link-bibliography: true
+---
+
+# Overview {background-color="#890000"}
+
+```{r}
+#| echo: false
+#| results: "asis"
+#| warning: false
+txt <- readLines("../notation.tex")
+
+txt <- gsub(pattern = "%.+", replacement = "", txt)
+
+gsub(pattern = "[\\]bm\\{([a-zA-Z\\]+)\\}", replacement = "\\\\boldsymbol{\\1}", txt) |>
+  cat(sep = "\n")
+```
+
+
+## Highlights @krivitskyTaleTwoDatasets2022
+
+What I highlight in their paper:
+
+- Start to finish framework for multi-ERG models.
+
+- Dealing with heterogeneous samples.
+
+- Model building process.
+
+- Goodness-of-fit analyses.
+
+Two important missing pieces (for the next paper): power analysis and how to deal with collinearity in small networks.
+
+# Power analysis in ERGMs {background-color="#890000"}
+
+## Sample size in ERGMs
+
+Two different questions: *How many nodes?* and "*How many networks?*"
+
+### Number of nodes
+
+- Is the network bounded?
+
+- If it is bounded, can we collect all the nodes?
+
+- If we cannot collect all the nodes, can we do inference [@schweinbergerNoteRoleProjectivity2017;@schweinbergerExponentialFamilyModelsRandom2020]?
+
+### Number of networks
+
+- There is a growing number of studies featuring multiple networks (e.g., egocentric studies).
+
+- There's no clear way to do power analysis in ERGMs.
+
+- In funding justification, power analysis is fundamental, so we need that.
+
+## A possible approach
+
+We can leverage conditional ERG models for power analysis.
+
+- Conditioning on one sufficient statistic results in a distribution invariant to the associated parameter, formally:
+
+  \begin{align}
+  \notag\Prcond{\Graph = \g}{\s{\g}_l = s_l}  & = \frac{%
+    \Pr{\s{\Graph}_{-l} = \s{\g}_{-l}, \s{\g}_l = s_l}
+  }{%
+    \sum_{\g'\in\GRAPH:\s{\g'}_l = s_l}\Pr{\s{\Graph} = \g'}%
+  } \\ & =  %
+  \frac{%
+    \exp{\t{\coef_{-l}}\s{\g}_{-l}}
+  }{%
+    \normconst_{-l}
+  }, \tag{1}
+  \end{align}
+
+  where $\s{\g}_l$ and $\coef_l$ are the $l$-th element of $\s{\g}$ and $\coef$ respectively, $\s{\g}_{-l}$ and $\coef_{-l}$ are their complement, and $\normconst_{-l} = \sum_{\g' \in \GRAPH: \s{\g'}_l = s_l}\exp{\t{\coef_{-l}}\s{\g'}_{-l}}$ is the normalizing constant.
+
+- We can use this to generate networks with a prescribed density (based on previous studies) and compute power through simulation.
+
+## Example: Detecting gender homophily
+
+::: {style="font-size: 80%"}
+
+ - Study gender homophily in networks of size 8.
+
+ - On average, the focal networks have 20 ties (\textit{i.e.}, a density of $(2\times 20)/(8 \times 7) \approx 0.71$).
+ 
+ - Want to detect an effect size of $\coef_{\mbox{homophily}} = 2$, we could approximate the required sample size in the following fashion:
+
+
+1.  For each $n \in N \equiv \{10, 20, \dots\}$, do:
+
+
+  a.   With Eq. (1), use MCMC to simulate $1,000$ sets of $n$ networks of size 8 and 20 ties.
+
+  b.   For each set, fit a conditional ERGM to estimate $\widehat{\coef}_{\mbox{homophily}}$, and generate the indicator variable $p_{n, i}$ equal to one if the estimate is significant at the 95\% level.
+  
+  c.   The empirical power for $n$ is equal to $p_n \equiv \frac{1}{1,000}\sum_{i}p_{n, i}$.
+
+
+2.  Once we have computed the sequence $\{p_{10}, p_{20}, \dots\}$, we can fit a linear model to estimate the sample size as a function of the power, \textit{i.e.}, $n = \beta_0 + \beta_1 p_n + \beta_2 p_n^2 + \varepsilon$.
+
+3.  With the previous model in hand, we can estimate the sample size required to detect a given effect size with a given power.
+
+:::
+
+# Collinearity in ERGMs {background-color="#890000"}
+
+## Not like in regular models
+
+- Variance Inflation Factor [VIF] is a common measure of collinearity in regular models.
+
+- Usually, VIF > 10 is considered problematic.
+
+- @duxburyDiagnosingMulticollinearityExponential2021's large simulation study recommends using VIF between 150 and 200 as a threshold for multicollinearity.
+
+- In small networks, this could be more severe.
+
+## Predicting statistics
+
+![](figures/conditional-prob-ttriad.png)
+
+## Collinearity in small networks
+
+::: {.columns}
+
+::: {.column width="50%"}
+![](figures/vif-n%3D5.png){width="100%"}
+:::
+
+::: {.column width="50%"}
+![](figures/cor-n%3D5.png){width="100%"}
+:::
+
+:::
+
+## Discussion
+
+A few questions:
+
+- How would you address power analysis in ERGMs?
+
+- VIFs and correlations across statistics are significantly high in dense networks. How much do you think it matters? If it matters, how would you address it? 
+
+- Relating both, is there any way in which a large sample size can help with collinearity?
+
+- In KCH, effect sizes are significantly large. 
+
+- How much heterogeneity? Networks in KCH range from two to eight, but how about bigger samples? In @schweinbergerNoteRoleProjectivity2017 it is mentioned the term "comparative", but there's no clear definition of what that means.
+
+<!-- - Since you have multi networks, have you thought about bootstrap methods?  -->
+
+---
+
+<!-- ::: {.fragment style="text-align: center; font-size: 120%"} -->
+### Thanks!
+
+george.vegayon at utah.edu
+
+[**https://ggv.cl**](https://ggvy.cl){target="_blank"}
+
+[{{< fa brands twitter >}} \@gvegayon](https://twitter.com/gvegayon){target="_blank"}
+<!-- ::: -->
+
+## References
