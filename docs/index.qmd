@@ -19,7 +19,7 @@ format:
     embed-resources: true
     mermaid-format: png
     self-contained-math: true
-bibliography: ../Bibliography-MM-MC.bib
+bibliography: ../bibliography.bib
 link-bibliography: true
 ---
 
