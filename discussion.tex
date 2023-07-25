@@ -7,6 +7,8 @@
 \usepackage{hyperref}
 \usepackage{url} % not crucial - just used below for the URL 
 
+\graphicspath{{./figures/}{.}{./terms/}}
+\usepackage{pstricks}
 
 %\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
@@ -44,7 +46,7 @@
 } \fi
 
 \if0\blind
-{
+{ 
   \bigskip
   \bigskip
   \bigskip
@@ -98,7 +100,7 @@ As high computational power is increasingly accessible, one possible approach is
     \item For each set, fit a conditional ERGM to estimate $\hat\coef_{\mbox{homophily}}$, and generate the indicator variable $p_{n, i}$ equal to one if the estimate is significant at the 95\% level.
     \item The empirical power for $n$ is equal to $p_n \equiv \frac{1}{1,000}\sum_{i}p_{n, i}$.
   \end{enumerate}
-  \item Once we have computed the sequence $\{p_{10}, p_{20}, \dots\}$, we can fit a linear model to estimate the sample size as a function of the power, \textit{i.e.}, $n = \beta_0 + \beta_1 p_n + \beta_2 p_n^2 + \varepsilon$.
+  \item Once we have computed the sequence $\{p_{10}, p_{20}, \dots\}$, we can fit a linear model to estimate the sample size as a function of the power, \textit{e.g.}, $n = \beta_0 + \beta_1 p_n + \beta_2 p_n^2 + \varepsilon$.
   \item With the previous model in hand, we can estimate the sample size required to detect a given effect size with a given power.
 \end{enumerate}
 

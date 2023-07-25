@@ -1,0 +1,1 @@
+exclude: [index.qmd, _extensions, figures, index.pdf]

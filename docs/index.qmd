@@ -1,15 +1,15 @@
 ---
 title: 'Power and multicollinearity in small networks: A discussion of'
-subtitle: '<text style="font-size: 170%;">"Tale of Two Datasets: Representativeness and Generalisability of Inference for Samples of Networks"</text><br><br>JSM 2023<br>Toronto, Canada'
+subtitle: '<text style="font-size: 150%;">"Tale of Two Datasets: Representativeness and Generalisability of Inference for Samples of Networks"</text><br><br>JSM 2023<br>Toronto, Canada'
 author: 
   - George G. Vega Yon, Ph.D.
 institute: The University of Utah
 aspectratio: 169
-date: 2023-06-28
+date: 2023-08-09
 format:
   revealjs:
     slide-number: true
-    footer: Vega Yon et al -- ggv.cl/slides/jsm2023 -- The University of Utah
+    footer: Vega Yon -- ggv.cl/slides/jsm2023 -- The University of Utah
     theme: ["default", "style.scss"]
     title-slide-attributes: 
       data-background-image: 'Zoom-Background_PrideU.jpg'
@@ -19,11 +19,17 @@ format:
     embed-resources: true
     mermaid-format: png
     self-contained-math: true
+  beamer:
+    keep-tex: true
+    slide-level: 2
+    include-in-header: ../notation.tex
 bibliography: ../bibliography.bib
 link-bibliography: true
 ---
 
 # Overview {background-color="#890000"}
+
+::: {.content-visible when-format="html"}
 
 ```{r}
 #| echo: false
@@ -37,6 +43,7 @@ gsub(pattern = "[\\]bm\\{([a-zA-Z\\]+)\\}", replacement = "\\\\boldsymbol{\\1}",
   cat(sep = "\n")
 ```
 
+:::
 
 ## Highlights @krivitskyTaleTwoDatasets2022
 
@@ -101,24 +108,24 @@ We can leverage conditional ERG models for power analysis.
 
 ::: {style="font-size: 80%"}
 
- - Study gender homophily in networks of size 8.
+ - Study gender homophily in networks of **size 8**.
 
- - On average, the focal networks have 20 ties (\textit{i.e.}, a density of $(2\times 20)/(8 \times 7) \approx 0.71$).
+ - On average, the focal networks have **20 ties** (*i.e.*, a density of $(2\times 20)/(8 \times 7) \approx 0.71$).
  
- - Want to detect an effect size of $\coef_{\mbox{homophily}} = 2$, we could approximate the required sample size in the following fashion:
+ - Want to **detect an effect size of $\coef_{\mbox{homophily}} = 2$**, we could approximate the required sample size in the following fashion:
 
 
 1.  For each $n \in N \equiv \{10, 20, \dots\}$, do:
 
 
-  a.   With Eq. (1), use MCMC to simulate $1,000$ sets of $n$ networks of size 8 and 20 ties.
+    a.   With Eq. (1), use MCMC to simulate $1,000$ sets of $n$ networks of size 8 and 20 ties.
 
-  b.   For each set, fit a conditional ERGM to estimate $\widehat{\coef}_{\mbox{homophily}}$, and generate the indicator variable $p_{n, i}$ equal to one if the estimate is significant at the 95\% level.
+    b.   For each set, fit a conditional ERGM to estimate $\widehat{\coef}_{\mbox{homophily}}$, and generate the indicator variable $p_{n, i}$ equal to one if the estimate is significant at the 95\% level.
   
-  c.   The empirical power for $n$ is equal to $p_n \equiv \frac{1}{1,000}\sum_{i}p_{n, i}$.
+    c.   The empirical power for $n$ is equal to $p_n \equiv \frac{1}{1,000}\sum_{i}p_{n, i}$.
 
 
-2.  Once we have computed the sequence $\{p_{10}, p_{20}, \dots\}$, we can fit a linear model to estimate the sample size as a function of the power, \textit{i.e.}, $n = \beta_0 + \beta_1 p_n + \beta_2 p_n^2 + \varepsilon$.
+2.  Once we have computed the sequence $\{p_{10}, p_{20}, \dots\}$, we can fit a linear model to estimate the sample size as a function of the power, *e.g.*, $n = \beta_0 + \beta_1 p_n + \beta_2 p_n^2 + \varepsilon$.
 
 3.  With the previous model in hand, we can estimate the sample size required to detect a given effect size with a given power.
 
@@ -138,48 +145,61 @@ We can leverage conditional ERG models for power analysis.
 
 ## Predicting statistics
 
-![](figures/conditional-prob-ttriad.png)
+In a directed network with 5 nodes, two of them female and three male, transitive triads are almost perfectly predicted by mutual ties.
+
+![](figures/conditional-prob-ttriad.png){width="80%" fig-align="center"}
+
+When $\coef_{\mbox{ttriad}} = 1$ (second row), Cor(transitive triads, mutual ties) $\to 1$, and VIF is > 4,500.
 
 ## Collinearity in small networks
+
+- In the same network (5 nodes), many combinations of model parameters yield high correlations and VIFs.
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-![](figures/vif-n%3D5.png){width="100%"}
+![](figures/vif-n%3D5.png){width="85%" fig-align="center"}
 :::
 
 ::: {.column width="50%"}
-![](figures/cor-n%3D5.png){width="100%"}
+![](figures/cor-n%3D5.png){width="85%" fig-align="center"}
 :::
 
 :::
+
+- KCH's networks were highly dense, (0.93 and 0.73 for the household and egocentric samples, respectively.) $\rightarrow$ collinearity should be severe.
 
 ## Discussion
 
-A few questions:
+- Krivitsky, Coletti, and Hens' work make an important contribution to ERG models, most relevant: model building, selection, and GOF for multi-network models.
 
-- How would you address power analysis in ERGMs?
+- Power (sample size requirements) and multicollinearity are two important issues that are yet to be addressed.
 
-- VIFs and correlations across statistics are significantly high in dense networks. How much do you think it matters? If it matters, how would you address it? 
+- I presented a possible approach to deal with power analysis in ERGMs using conditional distributions.
 
-- Relating both, is there any way in which a large sample size can help with collinearity?
+- Collinearity in small networks (like those in KCH) can be serious (more than in larger networks.) Yet we need to further explore this.
 
-- In KCH, effect sizes are significantly large. 
+::: {.columns}
 
-- How much heterogeneity? Networks in KCH range from two to eight, but how about bigger samples? In @schweinbergerNoteRoleProjectivity2017 it is mentioned the term "comparative", but there's no clear definition of what that means.
+::: {.column width=30%}
+:::
 
-<!-- - Since you have multi networks, have you thought about bootstrap methods?  -->
+::: {.column width=40% style="text-align: center;"}
 
----
-
-<!-- ::: {.fragment style="text-align: center; font-size: 120%"} -->
 ### Thanks!
+
 
 george.vegayon at utah.edu
 
 [**https://ggv.cl**](https://ggvy.cl){target="_blank"}
 
-[{{< fa brands twitter >}} \@gvegayon](https://twitter.com/gvegayon){target="_blank"}
+[{{< fa brands mastodon >}} \@gvegayon\@qoto.org](https://mastodon.social/@gvegayon@qoto.org){target="_blank"}
 <!-- ::: -->
+
+:::
+
+::: {.column width=30%}
+:::
+:::
 
 ## References

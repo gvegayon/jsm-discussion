@@ -321,7 +321,7 @@ plot_vif_cor <- function(coeffs., model., name. = "figures/%s.pdf") {
         )
 
   ggsave(sprintf(name., "vif"), width = 3.5, height = 3.5)
-  ggsave(sprintf(gsub("\\.pdf", ".png", name.), "vif"), width = 3.5, height = 3.5)
+  ggsave(sprintf(gsub("\\.pdf", ".png", name.), "vif"), width = 4, height = 3)
 
   # Same figure, but instead of VIF use correlation
   ans_same |>
@@ -355,7 +355,7 @@ plot_vif_cor <- function(coeffs., model., name. = "figures/%s.pdf") {
         )
 
   ggsave(sprintf(name., "cor"), width = 3.5, height = 3.5)
-  ggsave(sprintf(gsub("\\.pdf", ".png", name.), "cor"), width = 3.5, height = 3.5)
+  ggsave(sprintf(gsub("\\.pdf", ".png", name.), "cor"), width = 4, height = 3)
 
   invisible(ans_same)
 
