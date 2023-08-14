@@ -1,0 +1,72 @@
+
+% DELETED!
+% DELETED!
+% DELETED!
+% DELETED!
+% DELETED!
+
+% DELETED!
+\newcommand{\sufstats}[1]{\bm{g}\left(#1\right)}
+\renewcommand{\exp}[1]{\mbox{exp}\left\{#1\right\}}
+\renewcommand{\log}[1]{\mbox{log}\left\{#1\right\}}
+\newcommand{\transpose}[1]{{#1}^{\bm{t}}} 
+\renewcommand{\t}[1]{\transpose{#1}}
+
+\newcommand{\s}[1]{\sufstats{#1}}
+\newcommand{\SUFF}{\bm{S}}
+\newcommand{\Suff}{\bm{G}}
+\newcommand{\suff}{\bm{g}}
+
+\newcommand{\coef}{\bm{\theta}}
+\newcommand{\weight}{\bm{w}}
+\newcommand{\Weight}{\bm{W}}
+
+% Objects
+% DELETED!
+% DELETED!
+\newcommand{\Graph}{\bm{Y}}
+\newcommand{\graph}{\bm{y}}
+\newcommand{\g}{\graph}
+\newcommand{\GRAPH}{\mathcal{Y}}
+\newcommand{\Adjmat}{A}
+\newcommand{\adjmat}{a}
+\newcommand{\ADJMAT}{\bm{A}}
+
+\newcommand{\INDEPVAR}{\bm{X}}
+\newcommand{\Indepvar}{X}
+\newcommand{\indepvar}{x}
+
+\newcommand{\normconst}{\kappa_{\GRAPH}\left(\coef\right)}
+
+
+% \bibliography{bibliography.bib}
+
+\def\ergmito{ERGM\textit{ito}}
+\def\ergmitos{\ergmito{}\textit{s}}
+% Mathematical functions
+\newcommand{\isone}[1]{{\boldsymbol{1}\left( #1 \right)}}
+\newcommand{\f}[1]{{f\left(#1\right) }}
+
+% Define a command with an optional argument
+
+% \usepackage[]{xparse}
+% \NewDocumentCommand{\Prcond}{m m o}{
+%   \IfNoValueTF{#3}{%
+%   {\mbox{Pr}\left(#1;\;#2\right)} %
+%   }{%
+%   {\mbox{Pr}_{#3}\left(#1;\;#2\right)} %
+%   }
+% }
+
+\renewcommand{\Pr}[1]{{\mbox{Pr}_{\GRAPH,\coef}\left(#1\right) }}
+\newcommand{\Prcond}[2]{%
+  {\mbox{Pr}_{\GRAPH,\coef}\left(#1\left|\;#2\right.\right)}%
+  }
+\newcommand{\fcond}[2]{{f\left(#1|#2\right) }}
+\newcommand{\Expected}[1]{{\mathbb{E}\left\{#1\right\}}}
+\newcommand{\ExpectedCond}[2]{{\mathbb{E}\left\{#1\vphantom{#2}\right|\left.\vphantom{#1}#2\right\}}}
+\renewcommand{\exp}[1]{\mbox{exp}\left\{#1\right\}}
+
+\newcommand{\Likelihood}[2]{\text{L}\left(#1 \left|\vphantom{#1}#2\right.\right)}
+
+\newcommand{\loglik}[1]{l\left(#1\right)}

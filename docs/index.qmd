@@ -41,6 +41,8 @@ txt <- gsub(pattern = "%.+", replacement = "", txt)
 
 gsub(pattern = "[\\]bm\\{([a-zA-Z\\]+)\\}", replacement = "\\\\boldsymbol{\\1}", txt) |>
   cat(sep = "\n")
+
+alert <- function(x) {sprintf('<text style="color: #cc0000; font-weight: bold;">%s</text>', x)}
 ```
 
 :::
@@ -65,7 +67,7 @@ Two important missing pieces (for the next paper): power analysis and how to dea
 
 Two different questions: *How many nodes?* and "*How many networks?*"
 
-### Number of nodes
+### Number of nodes (the usual question)
 
 - Is the network bounded?
 
@@ -73,7 +75,7 @@ Two different questions: *How many nodes?* and "*How many networks?*"
 
 - If we cannot collect all the nodes, can we do inference [@schweinbergerNoteRoleProjectivity2017;@schweinbergerExponentialFamilyModelsRandom2020]?
 
-### Number of networks
+### Number of networks (not so usual)
 
 - There is a growing number of studies featuring multiple networks (e.g., egocentric studies).
 
@@ -82,6 +84,8 @@ Two different questions: *How many nodes?* and "*How many networks?*"
 - In funding justification, power analysis is fundamental, so we need that.
 
 ## A possible approach
+
+::: {style="font-size: 90%"}
 
 We can leverage conditional ERG models for power analysis.
 
@@ -102,32 +106,57 @@ We can leverage conditional ERG models for power analysis.
 
   where $\s{\g}_l$ and $\coef_l$ are the $l$-th element of $\s{\g}$ and $\coef$ respectively, $\s{\g}_{-l}$ and $\coef_{-l}$ are their complement, and $\normconst_{-l} = \sum_{\g' \in \GRAPH: \s{\g'}_l = s_l}\exp{\t{\coef_{-l}}\s{\g'}_{-l}}$ is the normalizing constant.
 
-- We can use this to generate networks with a prescribed density (based on previous studies) and compute power through simulation.
+- We can use this to generate networks with a prescribed edgecount (based on previous studies) and compute power through simulation.
+
+:::
 
 ## Example: Detecting gender homophily
 
 ::: {style="font-size: 80%"}
-
- - Study gender homophily in networks of **size 8**.
-
- - On average, the focal networks have **20 ties** (*i.e.*, a density of $(2\times 20)/(8 \times 7) \approx 0.71$).
  
- - Want to **detect an effect size of $\coef_{\mbox{homophily}} = 2$**, we could approximate the required sample size in the following fashion:
+::: {.columns}
 
+ Want to **detect an effect size of $\coef_{\mbox{homophily}} = 2$**, using conditional ERGMs (prev Eq.):
 
+::: {.column width="65%" style="background-color: #f0f0f0; border-radius: 10px; padding: 10px;"}
+
+ 
 1.  For each $n \in N \equiv \{10, 20, \dots\}$, do:
 
 
-    a.   With Eq. (1), use MCMC to simulate $1,000$ sets of $n$ networks of size 8 and 20 ties.
+    a.   **Simulate**: $1,000$ sets of $n$ undirected networks of size 8 and 26 ties.
 
-    b.   For each set, fit a conditional ERGM to estimate $\widehat{\coef}_{\mbox{homophily}}$, and generate the indicator variable $p_{n, i}$ equal to one if the estimate is significant at the 95\% level.
+    b.   **Fit ERGM** Estimate $\widehat{\coef}_{\mbox{homophily}}$, and generate the indicator variable $p_{n, i}$ equal to one if the estimate is significant at the 95\% level.
   
-    c.   The empirical power for $n$ is equal to $p_n \equiv \frac{1}{1,000}\sum_{i}p_{n, i}$.
+    c.   **Compute empirical power** $p_n \equiv \frac{1}{1,000}\sum_{i}p_{n, i}$.
 
 
-2.  Once we have computed the sequence $\{p_{10}, p_{20}, \dots\}$, we can fit a linear model to estimate the sample size as a function of the power, *e.g.*, $n = \beta_0 + \beta_1 p_n + \beta_2 p_n^2 + \varepsilon$.
+2.  **Model $n$ as a function of power** Using $\{p_{10}, p_{20}, \dots\}$, we can fit the model $n \sim f(p_n)$.
 
-3.  With the previous model in hand, we can estimate the sample size required to detect a given effect size with a given power.
+
+:::
+
+::: {.column width="35%"}
+
+Using KCH as a reference for density, we can fix the edge count to $0.93 \times 8 (8 - 1) / 2 \approx 26$
+
+```{r}
+#| echo: false
+#| label: table
+data.frame(
+  Parameter = c("Network size", "Edge count", "$\\coef_{\\mbox{homophily}}$", "$\\alpha$", "$1 - \\beta$"),
+  Value = c("8", "26", "2", "0.10", "0.80")
+) |>
+  knitr::kable()
+```
+
+<!-- Note that the **density** of the network is $\frac{20}{8 \times (8-1)} \approx 0.714$. -->
+
+:::
+
+:::
+
+Finally, the required sample size can be computed with $f(1-\beta) = f(0.80)$.
 
 :::
 
@@ -139,35 +168,44 @@ We can leverage conditional ERG models for power analysis.
 
 - Usually, VIF > 10 is considered problematic.
 
-- @duxburyDiagnosingMulticollinearityExponential2021's large simulation study recommends using VIF between 150 and 200 as a threshold for multicollinearity.
+- VIFs are not straightforward in ERGMs:
 
-- In small networks, this could be more severe.
+    - Traditional models can feature completely exogenous variables.
+
+    - ERGMs are by construction endogenous (`r alert("highly correlated")`).
+
+    - It is expected that VIFs will be higher in ERGMs.
+
+- @duxburyDiagnosingMulticollinearityExponential2021's large simulation study recommends using VIF between 20 and 150 as a threshold for multicollinearity.
+
+- As small networks usually are denser, VIFs can be more severe.
 
 ## Predicting statistics
 
-In a directed network with 5 nodes, two of them female and three male, transitive triads are almost perfectly predicted by mutual ties.
+::: {style="font-size: 75%"}
+- A directed network with 5 nodes, two of them female and three male.
 
-![](figures/conditional-prob-ttriad.png){width="80%" fig-align="center"}
+- Two models: **(a) Bernoulli** (0.50 density) and **(b) ERGM(edge count, transitivity)** (0.92 density).
 
-When $\coef_{\mbox{ttriad}} = 1$ (second row), Cor(transitive triads, mutual ties) $\to 1$, and VIF is > 4,500.
+- When $\coef_{\mbox{ttriad}} = 0.75$ and $\coef_{\mbox{edges}} = -2$ (second row), Cor(transitive triads, mutual ties) $\to 1$, and VIF reaches 140 (mutual ties).
+
+![](figures/conditional-prob-ttriad.png){width="85%" fig-align="center"}
+
+
+:::
 
 ## Collinearity in small networks
 
-- In the same network (5 nodes), many combinations of model parameters yield high correlations and VIFs.
+::: {style="font-size: 80%"}
 
-::: {.columns}
-
-::: {.column width="50%"}
-![](figures/vif-n%3D5.png){width="85%" fig-align="center"}
-:::
-
-::: {.column width="50%"}
-![](figures/cor-n%3D5.png){width="85%" fig-align="center"}
-:::
-
-:::
+- In the same network, many combinations of model parameters yield $\rho\to 1$ and high VIFs.
 
 - KCH's networks were highly dense, (0.93 and 0.73 for the household and egocentric samples, respectively.) $\rightarrow$ collinearity should be severe.
+
+$\Graph \sim \mbox{ERGM}(\mbox{edgecount}, \mbox{mutual ties}, \mbox{transitivity})$
+
+![](figures/vif-n%3D5.png){width="75%" fig-align="center"}
+:::
 
 ## Discussion
 
